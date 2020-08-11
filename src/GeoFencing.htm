@@ -1,0 +1,82 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"> 
+<html xmlns="http://www.w3.org/1999/xhtml"> 
+<head> 
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>Advik Geo Fencing</title> 
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
+</head>
+
+<body>
+ <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css"
+   integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
+   crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"
+   integrity="sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew=="
+   crossorigin=""></script>
+   <script src="leaflet-search.js"></script>
+   <!-- <script src="Leaflet.Editable.js"></script> -->
+   <!-- <script src="L.Path.Drag.js"></script>
+   <script src="L.Path.Drag-src.js"></script> -->
+<link rel="stylesheet" href="leaflet-search.css" />
+<!-- <link rel="stylesheet" href="style.css" /> -->
+
+<div id="mapid" style="width:100%; height:100%; position: fixed;"></div>
+
+<script>
+    var ltt=21.176729;
+    var lnn=79.105511;
+	var thefence;
+	var htmlStr="";
+	
+	var map = new L.Map('mapid', {zoom: 5, center: new L.latLng([ltt, lnn]) },{editable: true});
+	//var map = L.Map('mapid',{editable: true}).setView([ltt, lnn], 13);
+	map.addLayer(new L.TileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'));	//base layer
+	
+	map.addControl( new L.Control.Search({
+		url: 'https://nominatim.openstreetmap.org/search?format=json&q={s}',
+		jsonpParam: 'json_callback',
+		propertyName: 'display_name',
+		propertyLoc: ['lat','lon'],
+		marker: L.circleMarker([0,0],{radius:1}),
+		autoCollapse: true,
+		autoType: false,
+		minLength: 2
+	}).on('search:locationfound', function (latlng,title,layer)
+
+	{
+	var lt=latlng.latlng.lat;
+	var ln= latlng.latlng.lng;
+
+	var bounds = L.latLng(lt,ln).toBounds(500);
+	map.fitBounds(bounds);
+	var point1= L.latLng(lt + .0080,ln);//top
+    var point2= L.latLng(lt - .0080 ,ln - .0080);//left
+    var point3= L.latLng(lt - .0080,ln +.0080);//right
+
+	console.log('1:',point1);
+	console.log('2:',point2);
+	console.log('3:',point3);
+
+    thefence = new L.Polygon([point1,point2,point3], { draggable: true }).addTo(map);
+	// var temp=thefence.getLatLngs();
+	// htmlStr=temp[0].lat+","+temp[0].lng+";"+temp[1].lat+","+temp[1].lng+";"+temp[2].lat+","+temp[2].lng;
+	htmlStr=(lt + .0080)+","+ln+";"+(lt - .0080)+","+(ln - .0080)+";"+(lt - .0080)+","+(ln +.0080);
+    console.log('Positions: ',htmlStr);
+    // thefence.enableEdit();
+	
+
+}) );
+
+
+// GeoData = function GetPolyLatsLons()
+// {
+// 						//window.alert("from JS");	
+// 						//htmlStr+="~" + InitBoundary;
+// 						//htmlStr=htmlStr[0].lat+","+htmlStr[0].lng+";"+htmlStr[1].lat+","+htmlStr[1].lng+";"+htmlStr[2].lat+","+htmlStr[2].lng;
+						
+// 						return htmlStr;
+// }
+
+</script>
+</body>
+</html>
